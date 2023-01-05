@@ -5,6 +5,9 @@ import { agent } from './admin/context';
 import { AdminPage } from './admin/AdminPage';
 import LoadingPng from './table/loading.gif';
 import OperatorIcon from './assets/operator.png'
+import { Subject } from 'rxjs';
+
+export const onUpdate = new Subject<void>();
 
 function App() {
   const location = useLocation();
@@ -33,12 +36,11 @@ function App() {
 
         const form = e.target as HTMLFormElement;
 
-        const { method = 'get', attributes: { action: { value: url } = { value: location.pathname } } } = form as any;
-
-        agent({ method, url, data: new FormData(form) }).then(({ data }) => {
+        agent({ method: form.method, url: form.action, data: new FormData(form) }).then(({ data }) => {
           if (typeof data === 'string') {
             navigate(data)
           }
+          onUpdate.next();
         })
       }}
       onClick={(e) => {
@@ -57,9 +59,13 @@ function App() {
         if (e.target instanceof HTMLElement) {
           const anchor = getAnchor(e.target);
 
-          console.log(anchor);
+          if (!anchor) {
+            return;
+          }
 
-          if (anchor && (anchor.attributes as any)?.href?.value) {
+          const href = (anchor.attributes as any)?.href?.value;
+
+          if (href && !(href as string).startsWith('http')) {
             e.preventDefault();
             navigate((anchor.attributes as any)?.href?.value || '/');
           }
@@ -123,7 +129,7 @@ function App() {
                 ))}
               </div>
               <Routes>
-                {paths.map((path) => <Route key={path} path={path} element={<AdminPage path={path} />} />)}
+                {paths.map((path) => <Route key={path} path={path} element={<AdminPage key={path} path={path} />} />)}
               </Routes>
             </>
           )}

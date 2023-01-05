@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ReactNode } from 'react';
+import React, { useLayoutEffect, useState, ReactNode, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Column } from './types';
 import { AdminTable } from './AdminTable';
@@ -13,10 +13,12 @@ type HtmlComponent = {
 type TableComponent = {
   type: 'table',
   columns: Column<any>[],
-  tableId: string,
+  id: string,
 };
 
 type PageComponent = HtmlComponent | TableComponent;
+
+let cashLoadedPath: string | null = '';
 
 export function AdminPage({ path }: { path: string }) {
   const [components, setComponents] = useState<ReactNode[]>([]);
@@ -24,10 +26,14 @@ export function AdminPage({ path }: { path: string }) {
 
   const params = useParams();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (cashLoadedPath === path) return;
+    cashLoadedPath = path;
     setLoading(true);
+    
     agent.post('/admin/pages/load', { path, params }).then(({ data: { content, title } }) => {
       document.title = title;
+      
       setComponents(
         content.map((item: PageComponent, id: number) => {
           if (item.type === 'html') {
@@ -35,7 +41,7 @@ export function AdminPage({ path }: { path: string }) {
           }
 
           if (item.type === 'table') {
-            return <AdminTable columns={item.columns} id={item.tableId} />;
+            return <AdminTable columns={item.columns} id={item.id} />;
           }
 
           return <React.Fragment key={id}/>;

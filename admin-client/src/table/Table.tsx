@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Button, Checkbox, Input, Popconfirm, Radio, Space, Table as AntTable, Tooltip } from 'antd';
+import { Button, Form, Stack, Table as BootstrapTable, Tooltip } from 'react-bootstrap';
 import "./Table.scss"
 import { JustFilter, TableFilter, TableSort, TableType } from "./types";
 import FilterAndSortPng from './filter_and_sort.png';
@@ -110,12 +110,12 @@ export function Table<Data = any>({ columns, getData, ref }: TableType<Data>) {
             e.preventDefault();
             setSearch((e.target as any).elements.search.value)
           }}>
-            <Space direction="horizontal">
-              <Input name="search" placeholder="Поиск" />
-              <Button htmlType="submit">
+            <Stack direction="horizontal">
+              <Form.Control name="search" placeholder="Поиск" />
+              <Button type="submit">
                 <img className="icon" src={SearchPng} alt="search" />
               </Button>
-            </Space>
+            </Stack>
           </form>
           <Button onClick={renderData}>
             <img className="icon" src={UpdatePng} alt="update" />
@@ -130,91 +130,102 @@ export function Table<Data = any>({ columns, getData, ref }: TableType<Data>) {
             </div>
           )
           : (
-            <AntTable
-              columns={columns.map((column, id) => ({
-                dataIndex: 'column' + id,
-                width: column.width,
-                title: (
-                  <div
-                    style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}
-                  >
-                    <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: 5 }}>
-                      {column.title}
-                      {column.type === 'str' && <img className="icon" src={StrPng} alt="" />}
-                      {column.type === 'num' && <img className="icon" src={NumPng} alt="" />}
-                      {column.type === 'date' && <img className="icon" src={DatePng} alt="" />}
-                      {column.type === 'key' && <img className="icon" src={KeyPng} alt="" />}
-                      {column.type === 'img' && <img className="icon" src={ImagePng} alt="" />}
-                      {(column.type as string) === 'anchor' && <img className="icon" src={AnchorPng} alt="" />}
-                    </div>
-                    <Tooltip
-                      placement="bottomRight"
-                      color="white"
-                      title={(
-                        <div className="table__filter-sort-panel">
-                          <Space direction="vertical" size="small" className="table__prop">
-                            Сотрировка
-                            <Radio.Group
-                              value={getSortRadio(column.key)}
-                              onChange={(e) => setSortRadio(column.key, e.target.value)}
-                            >
-                              <Space style={{ width: '100%' }} direction="vertical" size="small">
-                                <Radio value="asc">от А до Я</Radio>
-                                <Radio value="desc">от Я до А</Radio>
-                                <Radio value="not">Нет</Radio>
-                              </Space>
-                            </Radio.Group>
-                            Фильтр
-                            <label>
-                              <Checkbox
-                                checked={!excludeNull.includes(column.key)}
-                                onClick={() => {
-                                  setExcludeNull(
-                                    excludeNull.includes(column.key)
-                                      ? excludeNull.filter(item => item !== column.key)
-                                      : [...excludeNull, column.key]
-                                  )
-                                }}
-                                style={{ marginRight: 5 }}
-                              />
-                              Показать пустые
-                            </label>
-                            {['str', 'password'].includes(column.type) && (
-                              <StringFilterForm {...inputFiltersProps(column.key)} />
-                            )}
-                            {column.type === 'num' && (
-                              <NumberFilterForm {...inputFiltersProps(column.key)} />
-                            )}
-                            {column.type === 'date' && (
-                              <DateFilterForm {...inputFiltersProps(column.key)} />
-                            )}
-                            {column.type === 'enum' && (
-                              <EnumFilterForm {...inputFiltersProps(column.key)} />
-                            )}
-                          </Space>
-                        </div>
-                      )}
-                    >
-                      <Button
-                        size="small"
-                        danger={sort.concat(filter as any).some(item => item.columnKey === column.key)}
+            <BootstrapTable>
+              <thead>
+                <tr>
+                  {columns.map((column) => (
+                    <th key={column.key}>
+
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+            </BootstrapTable>
+            // <BootstrapTable
+            //   columns={columns.map((column, id) => ({
+            //     dataField: 'column' + id,
+            //     width: column.width,
+            //     text: (
+            //       <div
+            //         style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}
+            //       >
+            //         <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: 5 }}>
+            //           {column.title}
+            //           {column.type === 'str' && <img className="icon" src={StrPng} alt="" />}
+            //           {column.type === 'num' && <img className="icon" src={NumPng} alt="" />}
+            //           {column.type === 'date' && <img className="icon" src={DatePng} alt="" />}
+            //           {column.type === 'key' && <img className="icon" src={KeyPng} alt="" />}
+            //           {column.type === 'img' && <img className="icon" src={ImagePng} alt="" />}
+            //           {(column.type as string) === 'anchor' && <img className="icon" src={AnchorPng} alt="" />}
+            //         </div>
+            //         <Tooltip
+            //           placement="bottomRight"
+            //           color="white"
+            //           title={(
+            //             <div className="table__filter-sort-panel">
+            //               <Space direction="vertical" size="small" className="table__prop">
+            //                 Сотрировка
+            //                 <Radio.Group
+            //                   value={getSortRadio(column.key)}
+            //                   onChange={(e) => setSortRadio(column.key, e.target.value)}
+            //                 >
+            //                   <Space style={{ width: '100%' }} direction="vertical" size="small">
+            //                     <Radio value="asc">от А до Я</Radio>
+            //                     <Radio value="desc">от Я до А</Radio>
+            //                     <Radio value="not">Нет</Radio>
+            //                   </Space>
+            //                 </Radio.Group>
+            //                 Фильтр
+            //                 <label>
+            //                   <Checkbox
+            //                     checked={!excludeNull.includes(column.key)}
+            //                     onClick={() => {
+            //                       setExcludeNull(
+            //                         excludeNull.includes(column.key)
+            //                           ? excludeNull.filter(item => item !== column.key)
+            //                           : [...excludeNull, column.key]
+            //                       )
+            //                     }}
+            //                     style={{ marginRight: 5 }}
+            //                   />
+            //                   Показать пустые
+            //                 </label>
+            //                 {['str', 'password'].includes(column.type) && (
+            //                   <StringFilterForm {...inputFiltersProps(column.key)} />
+            //                 )}
+            //                 {column.type === 'num' && (
+            //                   <NumberFilterForm {...inputFiltersProps(column.key)} />
+            //                 )}
+            //                 {column.type === 'date' && (
+            //                   <DateFilterForm {...inputFiltersProps(column.key)} />
+            //                 )}
+            //                 {column.type === 'enum' && (
+            //                   <EnumFilterForm {...inputFiltersProps(column.key)} />
+            //                 )}
+            //               </Space>
+            //             </div>
+            //           )}
+            //         >
+            //           <Button
+            //             size="small"
+            //             danger={sort.concat(filter as any).some(item => item.columnKey === column.key)}
                         
-                      >
-                        <img className="icon" src={FilterAndSortPng} alt="filterandsort" />
-                      </Button>
-                    </Tooltip>
-                  </div>
-                ),
-                key: 'column' + id,
-              }))}
-              pagination={false}
-              dataSource={[
-                ...data.map((item, itemId) => columns.reduce((acc, column, id) => ({
-                  ...acc,
-                  ['column' + id]: column.render(item, itemId)
-                }), {})),
-              ]}
-            />
+            //           >
+            //             <img className="icon" src={FilterAndSortPng} alt="filterandsort" />
+            //           </Button>
+            //         </Tooltip>
+            //       </div>
+            //     ),
+            //     key: 'column' + id,
+            //   }))}
+            //   pagination={false}
+            //   dataSource={[
+            //     ...data.map((item, itemId) => columns.reduce((acc, column, id) => ({
+            //       ...acc,
+            //       ['column' + id]: column.render(item, itemId)
+            //     }), {})),
+            //   ]}
+            // />
           )}
       </div>
       <div className="table__footer">

@@ -11,10 +11,10 @@ export const reduceArrayByParams = <Data extends object>(getData: () => Data[]) 
       }
       for (const key of Object.keys(item)) {
         const value = item[key];
-        if (typeof value === 'string' && new RegExp(search || '').test(value)) {
+        if (typeof value === 'string' && value.includes(search)) {
           return true;
         }
-        if (typeof value === 'number' && new RegExp(search || '').test(value + '')) {
+        if (typeof value === 'number' && ('' + value).includes(search)) {
           return true;
         }
       }
@@ -32,7 +32,7 @@ export const reduceArrayByParams = <Data extends object>(getData: () => Data[]) 
           }
         }
 
-        if (filter.name === 'str' && (!new RegExp(filter.search || '').test(value) || (filter.notInclude && new RegExp(filter.notInclude).test(value)))) {
+        if (filter.name === 'str' && (!value.includes(filter.search) || (!!filter.notInclude || value.includes(filter.notInclude)))) {
           return false;
         }
         if (filter.name === 'num' && ((!filter.from || value < filter.from) || (!filter.to || value > filter.to))) {

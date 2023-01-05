@@ -1,4 +1,5 @@
-import { Button } from 'antd';
+import { useEffect, useRef } from 'react';
+import { Button } from 'react-bootstrap';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import { Table } from '../table/Table';
@@ -6,18 +7,29 @@ import CopyIcon from './copy.png';
 import DownloadIcon from './download.png';
 import { agent } from './context';
 import { Column } from './types';
+import { onUpdate } from '../App';
 
 export function AdminTable({ id, columns }: { id: string, columns: Column<any>[] }) {
   const navigate = useNavigate();
+  const ref = useRef(() => {})
+
+  useEffect(() => {
+    const sub = onUpdate.subscribe(() => ref.current());
+
+    return () => sub.unsubscribe();
+  }, []);
 
   return (columns ? (
     <Table
+      ref={ref}
       columns={columns.map((column: any) => ({
         key: column.key as any,
         title: column.title,
         type: ['anchor', 'password'].includes(column.type) ? 'str' : column.type as any,
         values: column.values,
         render(row: any) {
+          console.log(row, column);
+          
           if (!row[column.key]) {
             return null;
           }
@@ -51,7 +63,7 @@ export function AdminTable({ id, columns }: { id: string, columns: Column<any>[]
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <img src={row[column.key]} alt={column.key} style={{ height: 50, width: 'auto' }} />
                 <a href={row[column.key]} target="_blank">
-                  <Button size="small">
+                  <Button size="sm">
                     <img src={DownloadIcon} className="icon" />
                   </Button>
                 </a>
@@ -62,7 +74,7 @@ export function AdminTable({ id, columns }: { id: string, columns: Column<any>[]
           if (column.type === 'key') {
             return (
               <div>
-                <Button style={{ marginRight: 10 }} size="small" onClick={() => navigator.clipboard.writeText(row[column.key])}>
+                <Button style={{ marginRight: 10 }} size="sm" onClick={() => navigator.clipboard.writeText(row[column.key])}>
                   <img src={CopyIcon} className="icon" />
                 </Button>
                 {row[column.key].slice(0, 5)}
@@ -75,7 +87,7 @@ export function AdminTable({ id, columns }: { id: string, columns: Column<any>[]
         }
       }))}
       getData={(params) => {
-        return agent.post(`/admin/pages/get-data`, { params, tableId: id }).then(res => res.data);
+        return agent.post(`/admin/pages/components/get-data`, { params, id }).then(res => res.data);
       }} 
     />
   ) : <>Загрузка...</>)
