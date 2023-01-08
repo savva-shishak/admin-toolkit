@@ -36,9 +36,16 @@ function App() {
 
         const form = e.target as HTMLFormElement;
 
-        agent({ method: form.method, url: form.action, data: new FormData(form) }).then(({ data }) => {
+        const action = document.activeElement?.getAttribute("formaction") || form.action;
+        const method = document.activeElement?.getAttribute("formmethod") || form.method;
+
+        agent({ method, url: action, data: new FormData(form) }).then(({ data }) => {
           if (typeof data === 'string') {
-            navigate(data)
+            if (data === 'reset') {
+              form.reset();
+            } else {
+              navigate(data)
+            }
           }
           onUpdate.next();
         })
@@ -78,6 +85,9 @@ function App() {
         gridTemplateColumns:'200px 1fr',
         gridTemplateRows: '100%',
         overflow: 'hidden',
+        position: 'fixed',
+        top: 0,
+        left: 0,
       }}
     >
       <Routes>

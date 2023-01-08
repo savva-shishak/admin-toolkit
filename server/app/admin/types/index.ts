@@ -1,3 +1,4 @@
+import { FormType } from "./form";
 import { TableType } from "./tables";
 
 export type JsxComponent = {
@@ -5,8 +6,16 @@ export type JsxComponent = {
   content: JSX.Element
 }
 
+export type Action = { type: 'action', action: (data: any) => any };
+
+export type TmpComponents = (
+  (TableType<any> & { type: 'table' })
+  | Action
+) & { id: string }
+
 export type ComponentsContentType = (
   (TableType<any> & { type: 'table' })
+  | (FormType & { type: 'form' })
   | JsxComponent
 );
 
@@ -20,3 +29,4 @@ export type PageType = {
 }
 
 export * from "./tables";
+export * from "./form";

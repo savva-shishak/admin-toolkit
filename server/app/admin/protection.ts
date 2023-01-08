@@ -4,6 +4,17 @@ import { publicRouter, router } from '.';
 
 let session: string | null = process.env.DEV_MODE === 'on' ? 'dev-session' : null;
 
+export async function protect(ctx: Context, next: Next) {
+  const session = ctx.headers.authorization;
+
+  if (session && ctx.headers.authorization === session) {
+    await next(); 
+  } else {
+    ctx.status = 401;
+    ctx.message = 'Auth error';
+  }
+}
+
 router.use(
   async (ctx: Context, next: Next) => {
     const session = ctx.headers.authorization;

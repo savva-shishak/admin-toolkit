@@ -36,6 +36,6 @@ agent.interceptors.response.use(
 )
 
 export async function login(login: string, password: string) {
-  await agent.post('/peer/auth', { role: 'admin', login, password })
+  await agent.post('/admin/login', { login, password })
     .then(res => tokenStore.update(() => ({ token: res.data })));  
 }

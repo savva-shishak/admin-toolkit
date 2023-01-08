@@ -1,0 +1,16 @@
+.page {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.head {
+  width: 100%;
+  padding: 15px 50px;
+  background: rgb(255, 217, 0);
+}
+
+.main {
+  width: 100%;
+  padding: 0 50px;
+}

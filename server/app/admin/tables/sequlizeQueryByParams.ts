@@ -57,6 +57,13 @@ export const sequlizeQueryByParams = (model: ModelStatic<any>, searchFields: str
       await model.count({ where }),
     ]);
 
+    console.log(await model.findAll({
+      limit,
+      offset,
+      where,
+      order: sort.map(({ columnKey, desc }) => [columnKey, desc ? 'DESC' : 'ASC'])
+    }));
+
     return {
       data,
       totalRows,

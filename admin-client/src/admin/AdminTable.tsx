@@ -14,22 +14,24 @@ export function AdminTable({ id, columns }: { id: string, columns: Column<any>[]
   const ref = useRef(() => {})
 
   useEffect(() => {
-    const sub = onUpdate.subscribe(() => ref.current());
+    const sub = onUpdate.subscribe(() => {
+      ref.current();
+      console.log('test');
+      
+    });
 
     return () => sub.unsubscribe();
   }, []);
 
   return (columns ? (
     <Table
-      ref={ref}
+      itemRef={ref}
       columns={columns.map((column: any) => ({
         key: column.key as any,
         title: column.title,
         type: ['anchor', 'password'].includes(column.type) ? 'str' : column.type as any,
         values: column.values,
         render(row: any) {
-          console.log(row, column);
-          
           if (!row[column.key]) {
             return null;
           }
@@ -63,7 +65,7 @@ export function AdminTable({ id, columns }: { id: string, columns: Column<any>[]
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <img src={row[column.key]} alt={column.key} style={{ height: 50, width: 'auto' }} />
                 <a href={row[column.key]} target="_blank">
-                  <Button size="sm">
+                  <Button variant="light" size="sm">
                     <img src={DownloadIcon} className="icon" />
                   </Button>
                 </a>
@@ -74,7 +76,7 @@ export function AdminTable({ id, columns }: { id: string, columns: Column<any>[]
           if (column.type === 'key') {
             return (
               <div>
-                <Button style={{ marginRight: 10 }} size="sm" onClick={() => navigator.clipboard.writeText(row[column.key])}>
+                <Button variant="light" style={{ marginRight: 10 }} size="sm" onClick={() => navigator.clipboard.writeText(row[column.key])}>
                   <img src={CopyIcon} className="icon" />
                 </Button>
                 {row[column.key].slice(0, 5)}

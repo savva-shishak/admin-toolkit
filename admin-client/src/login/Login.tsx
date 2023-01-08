@@ -27,7 +27,7 @@ export function Login() {
           </Form.Group>
           <Form.Group>
             <Form.Label>Пароль</Form.Label>
-            <Form.Control name="password" />
+            <Form.Control name="password" type="password" />
           </Form.Group>
           <Button type="submit" style={{ width: '100%' }}>Войти</Button>
         </Stack>

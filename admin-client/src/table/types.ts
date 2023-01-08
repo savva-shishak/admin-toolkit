@@ -59,7 +59,7 @@ export type GetDataParams = {
 
 export type TableType<Data> = {
   columns: Column<Data>[];
-  ref?: MutableRefObject<(() => any) | undefined>;
+  itemRef?: MutableRefObject<(() => any) | undefined>;
   getData: (params: GetDataParams) => Promise<{
     data: Data[];
     totalRows: number;

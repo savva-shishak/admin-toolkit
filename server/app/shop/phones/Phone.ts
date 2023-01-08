@@ -1,18 +1,9 @@
-import { INTEGER, Model, STRING, TEXT } from "sequelize";
+import { INTEGER, Model, TEXT } from "sequelize";
 import { sequelize } from "../../context/database";
 
 export type TPhone = Omit<Phone, keyof Model>;
 
 export class Phone extends Model<any, any> {
-  constructor(
-    public id: number = 0,
-    public name: string = '',
-    public price: number = 0,
-    public count: number = 0,
-    public image: string = '',
-  ) {
-    super();
-  }
 }
 
 Phone.init(
@@ -24,7 +15,11 @@ Phone.init(
       primaryKey: true,
     },
     name: {
-      type: STRING,
+      type: TEXT,
+      allowNull: false,
+    },
+    model: {
+      type: TEXT,
       allowNull: false,
     },
     price: {
@@ -42,6 +37,6 @@ Phone.init(
   },
   {
     sequelize,
-    tableName: 'phones'
+    tableName: 'phone-2'
   }
 );

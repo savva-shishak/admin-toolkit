@@ -8,6 +8,8 @@ import koaBody from 'koa-body';
 import koaLogger from 'koa-logger';
 import cors from 'koa-cors';
 import config from './config';
+import serve from 'koa-static';
+import mount from 'koa-mount';
 
 export const koa = new Koa();
 export const mainRouter = new Router();
@@ -27,6 +29,7 @@ export const httpServer =
 export const io = new WebsocketServer(httpServer, { cors: { origin: '*' } });
 
 koa.use(cors({ origin: '*' }));
+koa.use(mount(config.staticUrl, new Koa().use(serve(config.static))));
 koa.use(koaBody({ multipart: true }));
 koa.use(koaLogger());
 koa.use(mainRouter.allowedMethods());

@@ -9,7 +9,7 @@ import "./app/shop";
 
 async function runServers() {
   logger.info('Sinc with database');
-  await sequelize.sync({ });
+  await sequelize.sync();
   logger.info('Database sincronized');
 
   logger.info('Starting media server');
