@@ -8,6 +8,10 @@ import DownloadIcon from './download.png';
 import { agent } from './context';
 import { Column } from './types';
 import { onUpdate } from '../App';
+import { AdminCheckbox } from './AdminCheckbox';
+import { AdminSelect } from './AdminSelect';
+import { AdminMultiSelect } from './Admin.MultiSelect';
+import { AdminInput } from './AdminInput';
 
 export function AdminTable({ id, columns }: { id: string, columns: Column<any>[] }) {
   const navigate = useNavigate();
@@ -16,8 +20,6 @@ export function AdminTable({ id, columns }: { id: string, columns: Column<any>[]
   useEffect(() => {
     const sub = onUpdate.subscribe(() => {
       ref.current();
-      console.log('test');
-      
     });
 
     return () => sub.unsubscribe();
@@ -32,7 +34,7 @@ export function AdminTable({ id, columns }: { id: string, columns: Column<any>[]
         type: ['anchor', 'password'].includes(column.type) ? 'str' : column.type as any,
         values: column.values,
         render(row: any) {
-          if (!row[column.key]) {
+          if (row[column.key] === null || row[column.key] === undefined) {
             return null;
           }
 
@@ -83,6 +85,30 @@ export function AdminTable({ id, columns }: { id: string, columns: Column<any>[]
                 ...
               </div>
             )
+          }
+
+          if (column.type === 'checkbox') {
+            return (
+              <AdminCheckbox value={row[column.key]} row={row} actionId={column.onChange} />
+            );
+          }
+
+          if (column.type === 'select') {
+            return (
+              <AdminSelect options={column.options} value={row[column.key]} row={row} actionId={column.onChange} />
+            );
+          }
+
+          if (column.type === 'multiselect') {
+            return (
+              <AdminMultiSelect options={column.options} value={row[column.key]} row={row} actionId={column.onChange} />
+            );
+          }
+
+          if (column.type === 'input') {
+            return (
+              <AdminInput value={row[column.key]} row={row} actionId={column.onChange} />
+            );
           }
 
           return row[column.key];

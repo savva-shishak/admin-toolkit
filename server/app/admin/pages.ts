@@ -5,11 +5,25 @@ import { Action, renderForm, TableType } from "./types";
 import fs from 'fs/promises';
 import path from 'path';
 import config from "../context/config";
+import { reduceTable } from "./tables/reduceColumns";
 
-router.get('/pages/', (ctx) => {
+router.get('/pages/', async (ctx) => {
+
+  const menuPromise = (
+    await Promise.all(admin.menu
+      .map(async (item) => !item.auth || item.auth(ctx.state.user) ? item : null)
+    )
+  ).filter(item => item);
+
+  const pagesPromise = (
+    await Promise.all(admin.pages
+      .map(async (item) => !item.auth || item.auth(ctx.state.user) ? item : null)
+    )
+  ).filter(item => item);
+
   ctx.body = {
-    paths: admin.pages.map((page) => page.path),
-    menu: admin.menu,
+    paths: pagesPromise.map((page: any) => page.path),
+    menu: menuPromise,
   };
 });
 
@@ -18,30 +32,26 @@ router.post('/pages/load', async (ctx) => {
 
   const page = admin.pages.find((page) => page.path === path);
 
-  if (page) {
-    admin.compoents = [];
+  if (page && (!page.auth || await page.auth(ctx.state.user))) {
+    admin.compoents = admin.compoents.filter(({ userId }) => userId !== ctx.state.user.id);
     ctx.body = {
       title: typeof page.title === 'function' ? await page.title(params) : page.title,
       menu: admin.menu,
-      content: (await page.content(params)).map((item) => {
+      content: (await page.content(params, ctx.state.user)).map((item) => {
         if (typeof item === 'string' || typeof item === 'number') {
           return { type: 'html', payload: item };
         }
         const id = v4();
 
         if (item.type === 'table') {
-          admin.compoents.push({ ...item, id });
-          return {
-            type: 'table',
-            columns: item.columns,
-            id,
-          };
+          admin.compoents.push({ ...item, id, userId: ctx.state.user.id });
+          return reduceTable(ctx.state.user, item);
         }
 
         if (item.type === 'form') {
           return {
             type: 'html',
-            payload: renderForm(item)
+            payload: renderForm(item, ctx.state.user),
           }
         }
 
@@ -86,7 +96,7 @@ router.post('/pages/components/get-data', async (ctx) => {
 router.post('/pages/components/action/:id', async (ctx) => {
   const { id } = ctx.params;
   const body = ctx.request.body;
-  const filesReq = ctx.request.files || {}
+  const filesReq = ctx.request.files || {};
 
   const action = admin.compoents.find((com) => com.type === 'action' && com.id === id) as Action | null;
 

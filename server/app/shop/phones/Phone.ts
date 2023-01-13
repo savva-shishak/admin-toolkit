@@ -1,9 +1,17 @@
-import { INTEGER, Model, TEXT } from "sequelize";
+import { ARRAY, BOOLEAN, INTEGER, Model, STRING, TEXT } from "sequelize";
 import { sequelize } from "../../context/database";
 
 export type TPhone = Omit<Phone, keyof Model>;
 
 export class Phone extends Model<any, any> {
+  public declare id: number;
+  public declare name: string;
+  public declare model: string;
+  public declare price: number;
+  public declare count: number;
+  public declare image: string;
+  public declare published: boolean;
+  public declare equipment: string[];
 }
 
 Phone.init(
@@ -33,6 +41,14 @@ Phone.init(
     image: {
       type: TEXT,
       allowNull: false,
+    },
+    published: {
+      type: BOOLEAN,
+      allowNull: false,
+    },
+    equipment: {
+      type: ARRAY(STRING),
+      allowNull: false
     }
   },
   {

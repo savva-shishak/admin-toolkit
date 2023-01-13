@@ -54,10 +54,7 @@ export function Table<Data = any>({ columns, getData, itemRef }: TableType<Data>
   useEffect(() => {
     if (itemRef) {
       itemRef.current = renderData;
-      console.log(itemRef);
-    };
-    console.log(itemRef);
-    
+    };    
   }, [])
 
   const inputFiltersProps = (columnKey: string) => {
@@ -122,11 +119,11 @@ export function Table<Data = any>({ columns, getData, itemRef }: TableType<Data>
         </div>
       </div>
       <div className="table__content">
-        <BootstrapTable striped bordered hover>
+        <BootstrapTable style={{ tableLayout: 'fixed' }} striped bordered hover>
           <thead>
             <tr>
               {columns.map((column) => (
-                <th key={column.key}>
+                <th key={column.key}  style={{ width: column.width }}>
                   <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     {column.title}
                     <OverlayTrigger
@@ -212,9 +209,9 @@ export function Table<Data = any>({ columns, getData, itemRef }: TableType<Data>
           {!loading && (
             <tbody>
               {data.map((item, index) => (
-                <tr>
+                <tr key={index}>
                   {columns.map((column) => (
-                    <td key={column.key}>
+                    <td key={column.key} style={{ width: column.width }}>
                       {column.render(item, index)}
                     </td>
                   ))}

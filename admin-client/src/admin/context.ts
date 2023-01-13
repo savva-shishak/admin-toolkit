@@ -17,7 +17,7 @@ agent.interceptors.request.use(
   (request) => {
     request.headers = {
       ...(request.headers || {}),
-      authorization: 'Bearer ' + tokenStore.getRawState().token,
+      authorization: tokenStore.getRawState().token,
     };
 
     return request;

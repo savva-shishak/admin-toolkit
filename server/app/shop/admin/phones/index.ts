@@ -1,12 +1,14 @@
-import { admin, sequlizeQueryByParams } from "..";
+import { admin, PHONES, sequlizeQueryByParams } from "..";
 import { Phone } from "../../phones/Phone";
-import { input } from '../../../admin';
 
 import "./phone";
+import { ADMIN_ALL } from "../../../admin/Users";
+import { checkbox, input, multiselect, select } from "../../../admin";
 
 admin.pages.push(
   {
     path: '/shop/phones',
+    auth: (user) => user.grants.includes(PHONES) || user.grants.includes(ADMIN_ALL),
     title: 'Телефоны',
     async content() {
       return [
@@ -14,11 +16,18 @@ admin.pages.push(
           type: 'form',
           title: 'Новый телефон',
           inputs: [
-            input({
+            select({
               label: 'Название',
               name: 'name',
               value: '',
-              required: true
+              required: true,
+              options: [
+                'Samsung',
+                'IPhone',
+                'Nokia',
+                'Xiaomi',
+                'Galaxy'
+              ]
             }),
             input({
               label: 'Модель',
@@ -47,12 +56,38 @@ admin.pages.push(
               type: 'file',
               required: true
             }),
+            checkbox({
+              label: 'Опубликован',
+              name: 'published',
+              value: false,
+            }),
+            multiselect({
+              label: 'Комлектация',
+              name: 'equipment',
+              value: [],
+              options: [
+                'USB провод',
+                'Блок питания',
+                'Наушники проводные',
+                'Наушники беспроводные',
+                'Коробка',
+                'Паспорт',
+              ]
+            })
           ],
           actions: [
             {
               text: 'Добавить',
-              async action({ name, price, count, model, image }) {                
-                await Phone.create({ name, price, count, image, model });
+              async action({ name, price, count, model, image, published, equipment }) {  
+                const phone = new Phone();
+                phone.name = name;
+                phone.model = model;
+                phone.price = price;
+                phone.count = count;
+                phone.image = image;
+                phone.published = !!published;
+                phone.equipment = equipment;              
+                await phone.save();
                 return 'reset';
               }
             }
@@ -62,19 +97,33 @@ admin.pages.push(
           type: 'table',
           columns: [
             {
-              key: 'id',
-              title: 'ID',
-              type: 'anchor'
+              key: 'link',
+              title: 'Перейти',
+              type: 'anchor',
+              width: '100px',
             },
             {
               key: 'name',
               title: 'Название',
-              type: 'str'
+              type: 'select',
+              options: [
+                'Samsung',
+                'IPhone',
+                'Nokia',
+                'Xiaomi',
+                'Galaxy'
+              ],
+              async onChange({ row, inputValue }) {
+                await Phone.update({ name: inputValue }, { where: { id: row.id } });
+              },
             },
             {
               key: 'model',
               title: 'Модель',
-              type: 'str'
+              type: 'input',
+              async onChange({ row, inputValue }) {
+                await Phone.update({ model: inputValue }, { where: { id: row.id } });
+              }
             },
             {
               key: 'price',
@@ -90,15 +139,41 @@ admin.pages.push(
               key: 'image',
               title: 'Изображение',
               type: 'img'
-            }
+            },
+            {
+              key: 'published',
+              title: 'Опубликован',
+              type: 'checkbox',
+              async onChange({ row, inputValue }) {
+                await Phone.update({ published: inputValue }, { where: { id: row.id } });
+                return 'ok';
+              },
+            },
+            {
+              key: 'equipment',
+              title: 'Комплектация',
+              type: 'multiselect',
+              options: [
+                'USB провод',
+                'Блок питания',
+                'Наушники проводные',
+                'Наушники беспроводные',
+                'Коробка',
+                'Паспорт',
+              ],
+              async onChange({ row, inputValue }) {
+                await Phone.update({ equipment: inputValue }, { where: { id: row.id } });
+                return 'ok';
+              },
+            },
           ],
           getData: sequlizeQueryByParams(
             Phone,
             ['name', 'model'],
-            ({ id, name, model, image, price, count }) => ({
-              name, model, image, price, count,
-              id: {
-                label: id,
+            ({ id, name, model, image, price, count, published, equipment }) => ({
+              name, model, image, price, count, id, published, equipment,
+              link: {
+                label: 'Перейти',
                 href: '/shop/phones/' + id
               }
             })

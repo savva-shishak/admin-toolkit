@@ -28,28 +28,46 @@ export type NullFilter = {
 
 export type JustFilter = EnumFilter | DateFilter | NumberFilter | StringFilter | NullFilter;
 
-export type Column<Data> = {
-  key: keyof Data,
-  title: string,
-  type: 'num' | 'str' | 'anchor' | 'key' | 'img',
-} | {
-  key: keyof Data,
-  title: string,
-  type: 'enum',
-  values: string[],
-  width?: number,
-} | {
-  key: keyof Data,
-  title: string,
-  type: 'date',
-  format: string,
-  width?: number,
-} | {
-  key: keyof Data,
-  title: string,
-  type: 'anchor',
-  width?: number,
-}
+
+export type Column<Data> = (
+  {
+    key: keyof Data,
+    title: string,
+    width?: number | string,
+  } 
+  & (
+    {
+      type: 'num' | 'str' | 'anchor' | 'key' | 'img',
+    }
+    | {
+      type: 'enum',
+      values: string[],
+    }
+    | {
+      type: 'date',
+      format: string,
+    }
+    | {
+      type: 'checkbox',
+      onChange: (data: { row: Data, inputValue: boolean }) => any,
+    }
+    | {
+      type: 'select',
+      onChange: (data: { row: Data, inputValue: string }) => any,
+      options: ({ text: string, value: string } | string)[],
+    }
+    | {
+      type: 'multiselect',
+      onChange: (data: { row: Data, inputValue: ({ text: string, value: string } | string)[] }) => any,
+      options: ({ text: string, value: string } | string)[],
+    }
+    | {
+      type: 'input',
+      onChange: (data: { row: Data, inputValue: string }) => any,
+      inputType?: string,
+    }
+  )
+)
 
 export type TableSort = { desc: boolean, columnKey: string }
 export type TableFilter = { filter: JustFilter, columnKey: string };
