@@ -26,8 +26,9 @@ export function AdminPage({ path }: { path: string }) {
   const ref = useRef(document.createElement('div'));
 
   const params = useParams();
+  console.log(path);
 
-  useLayoutEffect(() => {
+  useLayoutEffect(() => {    
     if (cashLoadedPath === path) return;
     cashLoadedPath = path;
     setLoading(true);
@@ -52,7 +53,7 @@ export function AdminPage({ path }: { path: string }) {
       );
       setLoading(false);
       setTimeout(() => {
-        const inputs = Array.from(ref.current.querySelectorAll('input[type="file"]')) as HTMLInputElement[];
+        const inputs = Array.from(ref.current?.querySelectorAll('input[type="file"]') || []) as HTMLInputElement[];
         
         for (const input of inputs) {
           const value = input.attributes.getNamedItem('value')?.value || '';

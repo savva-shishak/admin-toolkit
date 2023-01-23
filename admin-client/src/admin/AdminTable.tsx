@@ -111,6 +111,10 @@ export function AdminTable({ id, columns }: { id: string, columns: Column<any>[]
             );
           }
 
+          if (column.type === 'html') {
+            return <div dangerouslySetInnerHTML={{ __html: row[column.key] }} />;
+          }
+
           return row[column.key];
         }
       }))}

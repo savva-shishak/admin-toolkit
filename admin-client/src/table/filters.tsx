@@ -48,7 +48,11 @@ export function NumberFilterForm(
   return (
     <form onSubmit={(e) => {
       e.preventDefault();
-      setValue({ name: 'num', to: +to, from: +from })
+      setValue({
+        name: 'num',
+        to: to === '' ? null : +to,
+        from: from === '' ? null : +from,
+      })
     }}>
       <Stack direction="vertical" gap={2}>
         <Form.Group>
