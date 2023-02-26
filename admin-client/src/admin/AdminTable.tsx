@@ -29,10 +29,10 @@ export function AdminTable({ id, columns }: { id: string, columns: Column<any>[]
     <Table
       itemRef={ref}
       columns={columns.map((column: any) => ({
+        ...column,
         key: column.key as any,
         title: column.title,
         type: ['anchor', 'password'].includes(column.type) ? 'str' : column.type as any,
-        values: column.values,
         render(row: any) {
           if (row[column.key] === null || row[column.key] === undefined) {
             return null;
