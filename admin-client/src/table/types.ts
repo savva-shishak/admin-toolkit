@@ -2,8 +2,8 @@ import { MutableRefObject, ReactNode } from "react"
 
 export type NumberFilter = {
   name: 'num',
-  from: number,
-  to: number,
+  from: number | null,
+  to: number | null,
 }
 
 export type StringFilter = {
